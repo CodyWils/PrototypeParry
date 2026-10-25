@@ -2,7 +2,11 @@ using UnityEngine;
 
 public class ParryProjectile : MonoBehaviour
 {
-    public float speed = 12f;
+        // Updates here
+    public float minSpeed = 12f;
+    public float maxSpeed = 32f;
+
+    private float speed;
 
     private Rigidbody rb;
     private Transform player;
@@ -10,6 +14,9 @@ public class ParryProjectile : MonoBehaviour
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
+
+        // Updates here
+        speed = Random.Range(minSpeed, maxSpeed);
     }
 
     public void SetTarget(Transform target)
@@ -26,22 +33,41 @@ public class ParryProjectile : MonoBehaviour
 
         Vector3 direction = (player.position - transform.position).normalized;
 
-        rb.MovePosition(
-            transform.position + direction * speed * Time.fixedDeltaTime
-        );
+        float distance = speed * Time.fixedDeltaTime;
 
+        // Update Here
         RaycastHit hit;
 
-        if (Physics.Raycast(
-            transform.position, direction, out hit, 1f))
-            {
-                IParryable target = hit.collider.GetComponent<IParryable>();
+        if (Physics.SphereCast(
+            transform.position,
+            0.3f,
+            direction,
+            out hit,
+            distance + 0.3f))
+        {
+            IParryable target = hit.collider.GetComponentInParent<IParryable>();
 
-                if (target != null)
-                {
-                    target.ReceiveAttack();
-                    Destroy(gameObject);
-                }
+            if (target != null)
+            {
+                target.ReceiveAttack();
+                Destroy(gameObject);
+                return;
             }
         }
+
+        // Move the projectile only if it has not hit the player.
+        rb.MovePosition(transform.position + direction * distance);
+    }
+
+        // Update here
+    private void OnCollisionEnter(Collision collision)
+    {
+        IParryable target = collision.gameObject.GetComponent<IParryable>();
+
+        if (target != null)
+        {
+            target.ReceiveAttack();
+            Destroy(gameObject);
+        }
+    }
 }

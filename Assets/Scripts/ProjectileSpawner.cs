@@ -5,13 +5,19 @@ public class ProjectileSpawner : MonoBehaviour
     public GameObject projectile;
     public Transform player;
 
-    public float spawnTime = 1.5f;
-    public float spawnDistance = 10f;
+        // Updates here
+    public float minSpawnTime = 0.3f;
+    public float maxSpawnTime = 2.4f;
+    public float spawnDistance = 20f;
 
+        // Updates here
+    private float spawnTime;
     private float timer;
 
     private void Start()
     {
+        // Updates here
+        spawnTime = Random.Range(minSpawnTime, maxSpawnTime);
         timer = -2f;
     }
 
@@ -23,6 +29,9 @@ public class ProjectileSpawner : MonoBehaviour
         {
             SpawnProjectile();
             timer = 0;
+
+            // Updates here
+            spawnTime = Random.Range(minSpawnTime, maxSpawnTime);
         }
     }
 
