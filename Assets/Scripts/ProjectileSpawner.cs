@@ -8,7 +8,8 @@ public class ProjectileSpawner : MonoBehaviour
         // Updates here
     public float minSpawnTime = 0.3f;
     public float maxSpawnTime = 2.4f;
-    public float spawnDistance = 20f;
+    // public float spawnDistance = 20f;
+    public float minimumSpawnDistance = 15f;
 
         // Updates here
     private float spawnTime;
@@ -18,11 +19,18 @@ public class ProjectileSpawner : MonoBehaviour
     {
         // Updates here
         spawnTime = Random.Range(minSpawnTime, maxSpawnTime);
-        timer = -2f;
+        timer = -0.5f;
     }
 
     private void Update()
     {
+        float distance = Vector3.Distance(transform.position, player.position);
+
+        if (distance <= minimumSpawnDistance)
+        {
+            return;
+        }
+
         timer += Time.deltaTime;
 
         if (timer >= spawnTime)
@@ -39,10 +47,8 @@ public class ProjectileSpawner : MonoBehaviour
     {
         Vector3 direction = (player.position - transform.position).normalized;
 
-        Vector3 position = player.position - direction * spawnDistance;
-
         GameObject newProjectile =
-            Instantiate(projectile, position, Quaternion.identity);
+            Instantiate(projectile, transform.position, Quaternion.identity);
 
         newProjectile.GetComponent<ParryProjectile>().SetTarget(player);
     }
